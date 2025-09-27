@@ -30,6 +30,18 @@ app.add_middleware(
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 print("I made it first")
 
+
+@app.get("/api/chatpdf")
+async def chat_with_pdf(
+    file: UploadFile = File(...),
+    prompt: str = Form(...),
+    model: str = Form("gpt-4.1-mini")  # good balance of cost/quality
+):
+
+    return "hello, world"
+
+
+
 @app.post("/api/chatpdf")
 async def chat_with_pdf(
     file: UploadFile = File(...),
