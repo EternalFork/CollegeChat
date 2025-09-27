@@ -38,6 +38,8 @@ async def chat_with_pdf(
 ):
 
     print("I made it second")
+    return JSONResponse({"answer": "dummy"})
+
     if file.content_type not in ("application/pdf",):
         raise HTTPException(status_code=400, detail="Please upload a PDF file.")
 
