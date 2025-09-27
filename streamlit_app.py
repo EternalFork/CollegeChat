@@ -28,6 +28,7 @@ app.add_middleware(
 
 # Use env var for security: export OPENAI_API_KEY="sk-..."
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+print("I made it first")
 
 @app.post("/api/chatpdf")
 async def chat_with_pdf(
@@ -36,7 +37,7 @@ async def chat_with_pdf(
     model: str = Form("gpt-4.1-mini")  # good balance of cost/quality
 ):
 
-    print("I made it 1")
+    print("I made it second")
     if file.content_type not in ("application/pdf",):
         raise HTTPException(status_code=400, detail="Please upload a PDF file.")
 
