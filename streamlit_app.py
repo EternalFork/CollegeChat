@@ -6,6 +6,27 @@
 
 
 # app.py
+!pip install fastapi "uvicorn[standard]" openai
+
+'''
+import sys
+import subprocess
+
+def install_package(package_name):
+    """
+    Installs a specified Python package using pip.
+    """
+    try:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
+        print(f"Successfully installed {package_name}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error installing {package_name}: {e}")
+
+# Example usage:
+install_package("requests")
+install_package("pandas==1.3.4") # Install a specific version
+'''
+
 import os
 from fastapi import FastAPI, File, Form, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
