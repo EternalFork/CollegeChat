@@ -26,8 +26,6 @@ install_package("fastapi")
 #install_package("pandas==1.3.4") # Install a specific version
 '''
 
-import streamlit-openai
-
 import os
 from fastapi import FastAPI, File, Form, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
