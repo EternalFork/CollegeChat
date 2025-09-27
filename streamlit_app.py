@@ -6,9 +6,8 @@
 
 
 # app.py
-!pip install fastapi "uvicorn[standard]" openai
+#!pip install fastapi "uvicorn[standard]" openai
 
-'''
 import sys
 import subprocess
 
@@ -23,9 +22,9 @@ def install_package(package_name):
         print(f"Error installing {package_name}: {e}")
 
 # Example usage:
-install_package("requests")
-install_package("pandas==1.3.4") # Install a specific version
-'''
+install_package("fastapi")
+#install_package("pandas==1.3.4") # Install a specific version
+
 
 import os
 from fastapi import FastAPI, File, Form, UploadFile, HTTPException
