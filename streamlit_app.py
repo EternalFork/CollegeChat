@@ -10,7 +10,7 @@
 
 import sys
 import subprocess
-
+'''
 def install_package(package_name):
     """
     Installs a specified Python package using pip.
@@ -24,7 +24,9 @@ def install_package(package_name):
 # Example usage:
 install_package("fastapi")
 #install_package("pandas==1.3.4") # Install a specific version
+'''
 
+import streamlit-openai
 
 import os
 from fastapi import FastAPI, File, Form, UploadFile, HTTPException
