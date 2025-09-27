@@ -91,6 +91,8 @@ async def chat_with_pdf(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Server error: {e}")
 
+'''
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app:chat_with_pdf", host="0.0.0.0", port=8000, reload=True)
+'''
