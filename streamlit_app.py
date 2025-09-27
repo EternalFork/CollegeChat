@@ -50,6 +50,8 @@ async def chat_with_pdf(
     prompt: str = Form(...),
     model: str = Form("gpt-4.1-mini")  # good balance of cost/quality
 ):
+
+    print("I made it 1")
     if file.content_type not in ("application/pdf",):
         raise HTTPException(status_code=400, detail="Please upload a PDF file.")
 
