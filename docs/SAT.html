@@ -148,7 +148,7 @@
       </div>
 
       <div class="footer small">
-        <strong>Notes:</strong> This demo POSTs <code>multipart/form-data</code> with fields <code>file</code> (the PDF) and <code>prompt</code> (your text) to <span class="monosmall">http://54.198.224.170:8000/api/chatpdf</span>. Ensure that endpoint allows CORS from your origin.
+        <strong>Notes:</strong> This demo POSTs <code>multipart/form-data</code> with fields <code>file</code> (the PDF) and <code>prompt</code> (your text) to <span class="monosmall">https://54.198.224.170:8000/api/chatpdf</span>. Ensure that endpoint allows CORS from your origin.
       </div>
     </div>
   </div>
@@ -165,7 +165,7 @@
       const result = document.getElementById('result');
       const renderJSON = document.getElementById('render-json');
       const renderHTML = document.getElementById('render-html');
-      const endpoint = 'http://54.198.224.170:8000/api/chatpdf';
+      const endpoint = 'https://54.198.224.170:8000/api/chatpdf';
 
       function setStatus(text, opts={}) {
         status.innerHTML = '';
