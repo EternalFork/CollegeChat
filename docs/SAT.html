@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chat with PDF</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a33;
+      --panel-2: #0f1730;
+      --text: #e9eefb;
+      --muted: #a9b4d0;
+      --accent: #6aa2ff;
+      --accent-2: #4dd4aa;
+      --danger: #ff6b6b;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 600px at 20% -10%, #1a2550, transparent),
+                  radial-gradient(1100px 500px at 120% 10%, #0f3a3a, transparent),
+                  var(--bg);
+      color: var(--text);
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 24px;
+    }
+    .card {
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid #1f2a4d;
+      border-radius: var(--radius);
+      box-shadow: 0 10px 25px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+      overflow: hidden;
+    }
+    .header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #1e2a4a;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .logo {
+      width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 4px 18px rgba(106,162,255,.45);
+    }
+    .title { font-weight: 700; font-size: 1.1rem; letter-spacing: .2px; }
+
+    form { padding: 20px; display: grid; gap: 16px; }
+
+    .dropzone {
+      display: grid; place-items: center; text-align: center;
+      padding: 28px; border: 2px dashed #2a396a; border-radius: 14px;
+      background: rgba(255,255,255,0.02);
+      transition: border-color .2s ease, background .2s ease, transform .06s ease;
+    }
+    .dropzone.dragover {
+      border-color: var(--accent);
+      background: rgba(106,162,255,.08);
+      transform: scale(1.01);
+    }
+    .hint { color: var(--muted); font-size: .95rem; }
+
+    .inputs {
+      display: grid; gap: 12px;
+    }
+    textarea {
+      width: 100%; min-height: 120px; resize: vertical;
+      background: #0e1530; color: var(--text);
+      border: 1px solid #26345f; border-radius: 12px; padding: 12px 14px; line-height: 1.4;
+    }
+    input[type="file"] { display: none; }
+    .file-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .btn, .file-btn {
+      appearance: none; border: 0; border-radius: 12px; padding: 12px 16px;
+      background: linear-gradient(135deg, var(--accent) 0%, #5f8cff 100%);
+      color: #06102a; font-weight: 700; cursor: pointer; letter-spacing: .2px;
+      box-shadow: 0 8px 20px rgba(106,162,255,.35);
+    }
+    .file-btn { background: linear-gradient(135deg, #2a396a, #203056); color: #e5ecff; box-shadow: none; border: 1px solid #2a396a; }
+
+    .status {
+      display: flex; gap: 12px; align-items: center; color: var(--muted); font-size: .95rem;
+    }
+    .spinner {
+      width: 18px; height: 18px; border-radius: 999px; border: 2px solid #2c3b70; border-top-color: var(--accent);
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .result {
+      border-top: 1px solid #1e2a4a;
+      padding: 18px 20px 24px;
+      display: grid; gap: 12px;
+    }
+    .result h3 { margin: 8px 0 0; font-size: 1rem; color: #cfe3ff; }
+    .result pre {
+      margin: 0; padding: 14px; background: #0a1026; border: 1px solid #1f2a4d; border-radius: 10px; overflow: auto;
+      font-size: .95rem;
+    }
+    .error { color: var(--danger); }
+    .row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+    .pill { padding: 8px 12px; background: #0f1733; border: 1px solid #24325d; border-radius: 999px; color: #cdd8f7; font-size: .9rem; }
+    .monosmall { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: .85rem; }
+    .footer { color: var(--muted); font-size: .9rem; padding: 0 20px 18px; }
+    .small { font-size: .85rem; color: #a9b4d0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" role="main">
+      <div class="header">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="title">CollegeChat</div>
+      </div>
+
+      <form id="chatpdf-form" novalidate>
+        <div id="dropzone" class="dropzone" tabindex="0" aria-label="PDF dropzone">
+          <div>
+            <h2 style="margin: 0 0 6px;">Upload a PDF</h2>
+            <div class="hint">Drag & drop a .pdf here — or use the button below.</div>
+          </div>
+        </div>
+
+        <div class="file-row">
+          <input id="file" type="file" accept="application/pdf,.pdf" />
+          <button type="button" class="file-btn" id="choose-btn">Choose PDF</button>
+          <div id="file-pill" class="pill monosmall" style="display:none;"></div>
+        </div>
+
+        <div class="inputs">
+          <label for="prompt" class="small">Your prompt</label>
+          <textarea id="prompt" name="prompt" placeholder="e.g., Summarize section 3 and extract all equations."></textarea>
+        </div>
+
+        <div class="row">
+          <div id="status" class="status" aria-live="polite"></div>
+          <button id="submit" type="submit" class="btn">Send</button>
+        </div>
+      </form>
+
+      <div class="result" id="result" hidden>
+        <h3>Response</h3>
+        <div id="render-html"></div>
+        <pre id="render-json" class="monosmall"></pre>
+      </div>
+
+      <div class="footer small">
+        <strong>Notes:</strong> This demo POSTs <code>multipart/form-data</code> with fields <code>file</code> (the PDF) and <code>prompt</code> (your text) to <span class="monosmall">http://54.198.224.170:8000/api/chatpdf</span>. Ensure that endpoint allows CORS from your origin.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const form = document.getElementById('chatpdf-form');
+      const fileInput = document.getElementById('file');
+      const chooseBtn = document.getElementById('choose-btn');
+      const dropzone = document.getElementById('dropzone');
+      const status = document.getElementById('status');
+      const submitBtn = document.getElementById('submit');
+      const filePill = document.getElementById('file-pill');
+      const result = document.getElementById('result');
+      const renderJSON = document.getElementById('render-json');
+      const renderHTML = document.getElementById('render-html');
+      const endpoint = 'http://54.198.224.170:8000/api/chatpdf';
+
+      function setStatus(text, opts={}) {
+        status.innerHTML = '';
+        if (opts.loading) {
+          const spin = document.createElement('div');
+          spin.className = 'spinner';
+          status.appendChild(spin);
+        }
+        const span = document.createElement('span');
+        span.textContent = text;
+        if (opts.error) span.className = 'error';
+        status.appendChild(span);
+      }
+
+      function bytes(n) {
+        if (!Number.isFinite(n)) return '';
+        const u = ['B','KB','MB','GB','TB']; let i = 0; let x = n;
+        while (x >= 1024 && i < u.length-1) { x /= 1024; i++; }
+        return x.toFixed(x<10 && i>0 ? 1 : 0) + ' ' + u[i];
+      }
+
+      function showFileBadge(file) {
+        if (!file) { filePill.style.display = 'none'; filePill.textContent=''; return; }
+        filePill.style.display = 'inline-block';
+        filePill.textContent = `${file.name} • ${file.type || 'application/pdf'} • ${bytes(file.size)}`;
+      }
+
+      chooseBtn.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', () => showFileBadge(fileInput.files[0]));
+
+      // Drag and drop handlers
+      const prevent = e => { e.preventDefault(); e.stopPropagation(); };
+      ['dragenter','dragover','dragleave','drop'].forEach(ev => dropzone.addEventListener(ev, prevent));
+      ['dragenter','dragover'].forEach(ev => dropzone.addEventListener(ev, () => dropzone.classList.add('dragover')));
+      ;['dragleave','drop'].forEach(ev => dropzone.addEventListener(ev, () => dropzone.classList.remove('dragover')));
+      dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer; const files = dt?.files;
+        if (files && files.length) {
+          const first = Array.from(files).find(f => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')) || files[0];
+          fileInput.files = new DataTransfer().files; // reset
+          const dt2 = new DataTransfer();
+          dt2.items.add(first);
+          fileInput.files = dt2.files;
+          showFileBadge(first);
+        }
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const file = fileInput.files[0];
+        const prompt = document.getElementById('prompt').value.trim();
+
+        if (!file) { setStatus('Please choose a PDF first.', {error: true}); return; }
+        if (!prompt) { setStatus('Please enter a prompt.', {error: true}); return; }
+
+        const formData = new FormData();
+        formData.append('file', file, file.name);
+        formData.append('prompt', prompt);
+
+        submitBtn.disabled = true;
+        setStatus('Sending request…', {loading: true});
+        result.hidden = true; renderJSON.textContent = ''; renderHTML.innerHTML = '';
+
+        try {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            body: formData,
+            // If the server requires credentials or custom headers, add here.
+            // mode: 'cors',
+          });
+
+          const contentType = res.headers.get('content-type') || '';
+          let payload;
+          if (contentType.includes('application/json')) {
+            payload = await res.json();
+          } else {
+            // Fallback to text; we will still display it nicely.
+            payload = await res.text();
+          }
+
+          if (!res.ok) {
+            const msg = typeof payload === 'string' ? payload : JSON.stringify(payload, null, 2);
+            throw new Error(`HTTP ${res.status} ${res.statusText}\n\n${msg}`);
+          }
+
+          setStatus('Done.');
+          result.hidden = false;
+
+          // Render: if the payload looks like { answer: "..." } or { html: "..." }, show it nicely.
+          if (payload && typeof payload === 'object') {
+            const maybeHtml = payload.html || payload.answer_html || null;
+            const maybeText = payload.answer || payload.text || null;
+            if (maybeHtml) {
+              renderHTML.innerHTML = maybeHtml; // assumes server-sanitized HTML
+            }
+            if (maybeText && !maybeHtml) {
+              // Simple paragraph render
+              const p = document.createElement('div');
+              p.textContent = String(maybeText);
+              renderHTML.appendChild(p);
+            }
+            renderJSON.textContent = JSON.stringify(payload, null, 2);
+          } else {
+            renderJSON.textContent = String(payload);
+          }
+        } catch (err) {
+          console.error(err);
+          setStatus(err.message || 'Request failed', {error: true});
+          result.hidden = false;
+          renderHTML.innerHTML = '';
+          renderJSON.textContent = '';
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
+sat2.html
+Displaying sat2.html.
