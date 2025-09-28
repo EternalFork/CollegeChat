@@ -22,4 +22,4 @@ Finally, chat.com was given the following prompt:
 
 (There are other options for the prompt, such as a 2-week plan or a plan for a particular topic)
 
-If you don't want to use chat.com directly, you can navigate to EternalFork.github.io/SAT.html, and upload the pdf and the prompts to the form on that web page. That will call a server, which in turn will use the chat.com API to get the results.
+If you don't want to use chat.com directly, you can navigate to [https://EternalFork.github.io/CollegeChat/SAT.html](https://EternalFork.github.io/CollegeChat/SAT.html), and upload the pdf and the prompts to the form on that web page. That will call a server, which in turn will use the chat.com API to get the results.
